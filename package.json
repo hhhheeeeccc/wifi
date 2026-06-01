@@ -1,0 +1,12 @@
+{
+  "name": "wifi-share-pro",
+  "version": "2.0.0",
+  "description": "WiFi Share Pro SentinelOne Bypass Edition",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "devDependencies": {
+    "electron": "^31.0.0"
+  }
+}

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>وثائق WiFi Share Pro</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            display: flex;
+            background-color: #f3f2f1;
+            color: #323130;
+        }
+        nav {
+            width: 250px;
+            background-color: #fff;
+            border-left: 1px solid #edebe9;
+            height: 100vh;
+            padding: 20px;
+        }
+        main {
+            flex-grow: 1;
+            padding: 40px;
+            overflow-y: auto;
+            background-color: #fff;
+            margin: 20px;
+            border-radius: 4px;
+            box-shadow: 0 0.3px 0.9px rgba(0,0,0,0.1), 0 1.6px 3.6px rgba(0,0,0,0.1);
+        }
+        h1 { border-bottom: 1px solid #edebe9; padding-bottom: 10px; }
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            border-right: 4px solid;
+        }
+        .alert-important { background-color: #fdf3f4; border-color: #d13438; }
+        .alert-tip { background-color: #f3f9f1; border-color: #107c10; }
+        .alert-warning { background-color: #fff4ce; border-color: #ffb900; }
+        code { background-color: #f3f2f1; padding: 2px 4px; border-radius: 2px; }
+    </style>
+</head>
+<body>
+    <nav>
+        <h3>المحتويات</h3>
+        <ul>
+            <li>المقدمة</li>
+            <li>تثبيت .NET Framework</li>
+            <li>تخطي SentinelOne</li>
+            <li>الأسئلة الشائعة</li>
+        </ul>
+    </nav>
+    <main>
+        <h1>دليل استخدام WiFi Share Pro</h1>
+        <p>مرحباً بك في دليل استخدام الأداة المتطورة لمشاركة الإنترنت.</p>
+
+        <div class="alert alert-important">
+            <strong>هام:</strong> يتطلب هذا البرنامج صلاحيات المسؤول (Admin) ليعمل بشكل صحيح.
+        </div>
+
+        <h2>تخطي SentinelOne عبر Safe Mode</h2>
+        <p>إذا كان نظامك محمياً بواسطة SentinelOne، فقد يتم حظر خدمات الهوتسبوت. يمكنك استخدام زر Safe Mode لإعادة التشغيل في بيئة لا يتم فيها تحميل برنامج الحماية.</p>
+
+        <div class="alert alert-warning">
+            <strong>تحذير:</strong> سيؤدي استخدام Safe Mode إلى تعطيل معظم برامج الحماية والخدمات غير الضرورية.
+        </div>
+
+        <h2>المتطلبات</h2>
+        <ul>
+            <li>Windows 10 أو 11</li>
+            <li>محول شبكة WiFi يدعم Hosted Network أو WinRT API</li>
+            <li>صلاحيات المسؤول</li>
+        </ul>
+    </main>
+</body>
+</html>

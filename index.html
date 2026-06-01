@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WiFi Share Pro SentinelOne Bypass Edition</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #121212;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background-color: #1e1e1e;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        h1 { font-size: 1.5rem; margin: 0; color: #0078d4; }
+        .info-bar {
+            background-color: #2d2d2d;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+        }
+        .status-item { margin-bottom: 5px; }
+        .input-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: bold; }
+        input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #333;
+            background-color: #252525;
+            color: #fff;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            margin-bottom: 10px;
+            transition: background-color 0.2s;
+        }
+        .btn-primary { background-color: #0078d4; color: white; }
+        .btn-primary:hover { background-color: #005a9e; }
+        .btn-danger { background-color: #d83b01; color: white; }
+        .btn-danger:hover { background-color: #a42e01; }
+        .btn-help {
+            background: none;
+            border: 1px solid #555;
+            color: #aaa;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            margin: 0;
+        }
+        .warning {
+            color: #ffaa44;
+            border: 1px solid #ffaa44;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 20px;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>WiFi Share Pro v2.0</h1>
+        <button id="helpBtn" class="btn-help">؟</button>
+    </header>
+
+    <div class="container">
+        <div class="info-bar">
+            <div class="status-item">Admin: <span id="adminStatus">...</span></div>
+            <div class="status-item">SentinelOne: <span id="s1Status">...</span></div>
+            <div class="status-item">WiFi: <span id="wifiName">...</span></div>
+        </div>
+
+        <div class="input-group">
+            <label>اسم الشبكة (SSID)</label>
+            <input type="text" id="ssid" value="WiFiSharePro">
+        </div>
+        <div class="input-group">
+            <label>كلمة المرور (8 أحرف على الأقل)</label>
+            <input type="password" id="password" value="Pass1234!">
+        </div>
+
+        <button id="startBtn" class="btn-primary">🔵 تشغيل الهوتسبوت</button>
+        <button id="safeModeBtn" class="btn-danger">⚠️ Safe Mode (لـ SentinelOne)</button>
+        <button id="normalModeBtn" class="btn-primary" style="display: none; background-color: #107c10;">🔄 العودة للوضع الطبيعي</button>
+
+        <div id="msg" style="margin-top: 20px; text-align: center;"></div>
+
+        <div class="warning">
+            ⚠️ SentinelOne شغال! استخدم زر Safe Mode إذا واجهت مشاكل.
+            <br>للاستخدام في بيئة التطوير والاختبار المصرح بها فقط.
+        </div>
+    </div>
+
+    <script src="renderer.js"></script>
+</body>
+</html>
