@@ -2,75 +2,66 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>وثائق WiFi Share Pro</title>
+    <title>دليل استخدام WiFi Hotspot Pro</title>
     <style>
         body {
-            font-family: 'Segoe UI', sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+            line-height: 1.6;
             margin: 0;
-            display: flex;
-            background-color: #f3f2f1;
-            color: #323130;
-        }
-        nav {
-            width: 250px;
-            background-color: #fff;
-            border-left: 1px solid #edebe9;
-            height: 100vh;
-            padding: 20px;
-        }
-        main {
-            flex-grow: 1;
             padding: 40px;
-            overflow-y: auto;
-            background-color: #fff;
-            margin: 20px;
-            border-radius: 4px;
-            box-shadow: 0 0.3px 0.9px rgba(0,0,0,0.1), 0 1.6px 3.6px rgba(0,0,0,0.1);
         }
-        h1 { border-bottom: 1px solid #edebe9; padding-bottom: 10px; }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        h1 { color: #3b82f6; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; }
+        h2 { color: #1e293b; margin-top: 25px; }
         .alert {
             padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 4px;
+            margin: 20px 0;
+            border-radius: 6px;
             border-right: 4px solid;
         }
-        .alert-important { background-color: #fdf3f4; border-color: #d13438; }
-        .alert-tip { background-color: #f3f9f1; border-color: #107c10; }
-        .alert-warning { background-color: #fff4ce; border-color: #ffb900; }
-        code { background-color: #f3f2f1; padding: 2px 4px; border-radius: 2px; }
+        .alert-info { background-color: #eff6ff; border-color: #3b82f6; color: #1d4ed8; }
+        ul { padding-right: 20px; }
+        li { margin-bottom: 10px; }
     </style>
 </head>
 <body>
-    <nav>
-        <h3>المحتويات</h3>
-        <ul>
-            <li>المقدمة</li>
-            <li>تثبيت .NET Framework</li>
-            <li>تخطي SentinelOne</li>
-            <li>الأسئلة الشائعة</li>
-        </ul>
-    </nav>
-    <main>
-        <h1>دليل استخدام WiFi Share Pro</h1>
-        <p>مرحباً بك في دليل استخدام الأداة المتطورة لمشاركة الإنترنت.</p>
+    <div class="container">
+        <h1>WiFi Hotspot Pro - دليل المستخدم</h1>
 
-        <div class="alert alert-important">
-            <strong>هام:</strong> يتطلب هذا البرنامج صلاحيات المسؤول (Admin) ليعمل بشكل صحيح.
+        <div class="alert alert-info">
+            <strong>ملاحظة:</strong> هذا التطبيق مصمم ليعمل كبديل احترافي لمشاركة الإنترنت في بيئات العمل والمنزل.
         </div>
 
-        <h2>تخطي SentinelOne عبر Safe Mode</h2>
-        <p>إذا كان نظامك محمياً بواسطة SentinelOne، فقد يتم حظر خدمات الهوتسبوت. يمكنك استخدام زر Safe Mode لإعادة التشغيل في بيئة لا يتم فيها تحميل برنامج الحماية.</p>
-
-        <div class="alert alert-warning">
-            <strong>تحذير:</strong> سيؤدي استخدام Safe Mode إلى تعطيل معظم برامج الحماية والخدمات غير الضرورية.
-        </div>
-
-        <h2>المتطلبات</h2>
+        <h2>المتطلبات الأساسية</h2>
         <ul>
-            <li>Windows 10 أو 11</li>
-            <li>محول شبكة WiFi يدعم Hosted Network أو WinRT API</li>
-            <li>صلاحيات المسؤول</li>
+            <li>نظام تشغيل Windows 10 أو أحدث.</li>
+            <li>محول شبكة لاسلكي (WiFi Adapter) يدعم ميزة نقطة الاتصال.</li>
+            <li>تشغيل البرنامج بصلاحيات المسؤول (Run as Administrator).</li>
         </ul>
-    </main>
+
+        <h2>كيفية الاستخدام</h2>
+        <ol>
+            <li>انتقل إلى علامة تبويب <strong>الإعدادات</strong> لتغيير اسم الشبكة وكلمة المرور.</li>
+            <li>عد إلى علامة تبويب <strong>الحالة</strong> واضغط على "تشغيل نقطة الاتصال".</li>
+            <li>يمكنك مراقبة الأجهزة المتصلة من خلال علامة تبويب <strong>الأجهزة المتصلة</strong>.</li>
+        </ol>
+
+        <h2>حل المشكلات</h2>
+        <p>إذا لم تظهر الشبكة على الأجهزة الأخرى، تأكد من:</p>
+        <ul>
+            <li>تفعيل الواي فاي في جهازك الأصلي.</li>
+            <li>السماح للتطبيق بالوصول عبر جدار الحماية (Firewall).</li>
+            <li>وجود اتصال إنترنت نشط في الجهاز ليتم مشاركته.</li>
+        </ul>
+    </div>
 </body>
 </html>

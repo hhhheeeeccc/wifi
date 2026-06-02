@@ -32,6 +32,25 @@ async function getWifiInfo() {
   }
 }
 
+async function getConnectedClients() {
+  try {
+    const script = `
+      Get-NetNeighbor | Where-Object { $_.State -eq 'Reachable' -and $_.IPAddress -notlike '169.254.*' -and $_.IPAddress -notlike 'fe80*' } |
+      Select-Object IPAddress, LinkLayerAddress | ConvertTo-Json
+    `;
+    const { stdout } = await execPromise(`powershell "${script.replace(/\n/g, '')}"`);
+    if (!stdout.trim()) return [];
+    const neighbors = JSON.parse(stdout);
+    return (Array.isArray(neighbors) ? neighbors : [neighbors]).map(n => ({
+      ip: n.IPAddress,
+      mac: n.LinkLayerAddress,
+      name: 'Connected Device'
+    }));
+  } catch (e) {
+    return [];
+  }
+}
+
 function sanitizeInput(str) {
   return str.replace(/["';`$()]/g, '');
 }
@@ -57,25 +76,6 @@ async function tryWinRT(ssid, password) {
   }
 }
 
-async function disableSafeMode() {
-  try {
-    await execPromise('bcdedit /deletevalue {current} safeboot');
-    await execPromise('shutdown /r /t 0');
-    return { success: true };
-  } catch (e) {
-    return { success: false, error: e.message };
-  }
-}
-
-async function isSafeMode() {
-  try {
-    const { stdout } = await execPromise('powershell "$env:SAFEBOOT_OPTION"');
-    return stdout.trim() !== "";
-  } catch (e) {
-    return false;
-  }
-}
-
 async function enableICS() {
   const script = `
     $publicAdapter = Get-NetAdapter | Where-Object { $_.Status -eq 'Up' -and $_.MediaType -ne 'Native 802.11' } | Select-Object -First 1
@@ -96,20 +96,12 @@ async function enableICS() {
   }
 }
 
-async function setSafeMode() {
-  try {
-    await execPromise('bcdedit /set {current} safeboot minimal');
-    await execPromise('shutdown /r /t 0');
-    return { success: true };
-  } catch (e) {
-    return { success: false, error: e.message };
-  }
-}
-
 function createWindow() {
   const mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 650,
+    height: 550,
+    resizable: false,
+    autoHideMenuBar: true,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
@@ -127,8 +119,11 @@ app.whenReady().then(() => {
     const isAdmin = await checkAdmin();
     const s1Running = await checkSentinelOne();
     const wifiInfo = await getWifiInfo();
-    const inSafeMode = await isSafeMode();
-    return { isAdmin, s1Running, wifiInfo, inSafeMode };
+    return { isAdmin, s1Running, wifiInfo };
+  });
+
+  ipcMain.handle('get-connected-clients', async () => {
+    return await getConnectedClients();
   });
 
   ipcMain.handle('start-hotspot', async (event, { ssid, password }) => {
@@ -138,26 +133,6 @@ app.whenReady().then(() => {
       return { success: true };
     }
     return winrtResult;
-  });
-
-  ipcMain.handle('enable-safe-mode', async () => {
-    return await setSafeMode();
-  });
-
-  ipcMain.handle('disable-safe-mode', async () => {
-    return await disableSafeMode();
-  });
-
-  ipcMain.on('open-docs', () => {
-    const docsWindow = new BrowserWindow({
-      width: 1000,
-      height: 800,
-      webPreferences: {
-        nodeIntegration: false,
-        contextIsolation: true
-      }
-    });
-    docsWindow.loadFile('docs.html');
   });
 
   app.on('activate', function () {
