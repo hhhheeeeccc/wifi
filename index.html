@@ -3,122 +3,237 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WiFi Share Pro SentinelOne Bypass Edition</title>
+    <title>WiFi Hotspot Pro</title>
     <style>
+        :root {
+            --bg-color: #0f172a;
+            --container-bg: #1e293b;
+            --primary-color: #3b82f6;
+            --primary-hover: #2563eb;
+            --text-color: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --accent-color: #10b981;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #121212;
-            color: #e0e0e0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
             margin: 0;
-            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .app-container {
+            width: 600px;
+            height: 500px;
+            background-color: var(--container-bg);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
             display: flex;
             flex-direction: column;
-            align-items: center;
+            border: 1px solid var(--border-color);
         }
-        header {
-            width: 100%;
+
+        .header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: var(--primary-color);
+        }
+
+        .tabs {
+            display: flex;
+            background-color: #0f172a50;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab-btn.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+            background-color: #ffffff05;
+        }
+
+        .tab-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .status-card {
+            background-color: #ffffff05;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border-color);
+        }
+
+        .status-row {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
+            margin-bottom: 10px;
         }
-        .container {
-            width: 100%;
-            max-width: 500px;
-            background-color: #1e1e1e;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+
+        .status-label {
+            color: var(--text-muted);
         }
-        h1 { font-size: 1.5rem; margin: 0; color: #0078d4; }
-        .info-bar {
-            background-color: #2d2d2d;
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 20px;
+
+        .status-value {
+            font-weight: bold;
+        }
+
+        .status-value.on { color: var(--accent-color); }
+        .status-value.off { color: #ef4444; }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--text-muted);
             font-size: 0.9rem;
         }
-        .status-item { margin-bottom: 5px; }
-        .input-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; font-weight: bold; }
+
         input {
             width: 100%;
             padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #333;
-            background-color: #252525;
-            color: #fff;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background-color: #0f172a;
+            color: white;
             box-sizing: border-box;
         }
-        button {
+
+        .btn {
             width: 100%;
             padding: 12px;
             border: none;
-            border-radius: 5px;
+            border-radius: 6px;
             cursor: pointer;
             font-weight: bold;
             font-size: 1rem;
-            margin-bottom: 10px;
             transition: background-color 0.2s;
         }
-        .btn-primary { background-color: #0078d4; color: white; }
-        .btn-primary:hover { background-color: #005a9e; }
-        .btn-danger { background-color: #d83b01; color: white; }
-        .btn-danger:hover { background-color: #a42e01; }
-        .btn-help {
-            background: none;
-            border: 1px solid #555;
-            color: #aaa;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+
+        .btn-primary { background-color: var(--primary-color); color: white; }
+        .btn-primary:hover { background-color: var(--primary-hover); }
+
+        .client-list {
+            list-style: none;
             padding: 0;
             margin: 0;
         }
-        .warning {
-            color: #ffaa44;
-            border: 1px solid #ffaa44;
+
+        .client-item {
+            display: flex;
+            justify-content: space-between;
             padding: 10px;
-            border-radius: 5px;
-            margin-top: 20px;
-            font-size: 0.85rem;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.9rem;
+        }
+
+        .client-info span {
+            display: block;
+        }
+
+        .client-mac {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .footer {
+            padding: 10px;
+            font-size: 0.8rem;
+            text-align: center;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border-color);
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>WiFi Share Pro v2.0</h1>
-        <button id="helpBtn" class="btn-help">؟</button>
-    </header>
-
-    <div class="container">
-        <div class="info-bar">
-            <div class="status-item">Admin: <span id="adminStatus">...</span></div>
-            <div class="status-item">SentinelOne: <span id="s1Status">...</span></div>
-            <div class="status-item">WiFi: <span id="wifiName">...</span></div>
+    <div class="app-container">
+        <div class="header">
+            <h1>WiFi Hotspot Pro</h1>
         </div>
 
-        <div class="input-group">
-            <label>اسم الشبكة (SSID)</label>
-            <input type="text" id="ssid" value="WiFiSharePro">
-        </div>
-        <div class="input-group">
-            <label>كلمة المرور (8 أحرف على الأقل)</label>
-            <input type="password" id="password" value="Pass1234!">
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="status">الحالة</button>
+            <button class="tab-btn" data-tab="clients">الأجهزة المتصلة</button>
+            <button class="tab-btn" data-tab="settings">الإعدادات</button>
         </div>
 
-        <button id="startBtn" class="btn-primary">🔵 تشغيل الهوتسبوت</button>
-        <button id="safeModeBtn" class="btn-danger">⚠️ Safe Mode (لـ SentinelOne)</button>
-        <button id="normalModeBtn" class="btn-primary" style="display: none; background-color: #107c10;">🔄 العودة للوضع الطبيعي</button>
+        <!-- Status Tab -->
+        <div id="status" class="tab-content active">
+            <div class="status-card">
+                <div class="status-row">
+                    <span class="status-label">حالة الشبكة:</span>
+                    <span id="hotspotStatus" class="status-value off">مغلق</span>
+                </div>
+                <div class="status-row">
+                    <span class="status-label">اسم الشبكة (SSID):</span>
+                    <span id="currentSSID" class="status-value">---</span>
+                </div>
+                <div class="status-row">
+                    <span class="status-label">الأجهزة المتصلة:</span>
+                    <span id="clientCount" class="status-value">0</span>
+                </div>
+            </div>
 
-        <div id="msg" style="margin-top: 20px; text-align: center;"></div>
+            <button id="startBtn" class="btn btn-primary">تشغيل نقطة الاتصال</button>
+            <p id="msg" style="text-align: center; margin-top: 15px; font-size: 0.9rem; color: var(--text-muted);"></p>
+        </div>
 
-        <div class="warning">
-            ⚠️ SentinelOne شغال! استخدم زر Safe Mode إذا واجهت مشاكل.
-            <br>للاستخدام في بيئة التطوير والاختبار المصرح بها فقط.
+        <!-- Clients Tab -->
+        <div id="clients" class="tab-content">
+            <ul id="clientList" class="client-list">
+                <li style="text-align: center; color: var(--text-muted); margin-top: 20px;">لا توجد أجهزة متصلة حالياً</li>
+            </ul>
+        </div>
+
+        <!-- Settings Tab -->
+        <div id="settings" class="tab-content">
+            <div class="form-group">
+                <label>اسم الشبكة (SSID)</label>
+                <input type="text" id="ssid" value="WiFiHotspotPro">
+            </div>
+            <div class="form-group">
+                <label>كلمة المرور (8 أحرف على الأقل)</label>
+                <input type="password" id="password" value="Pass1234!">
+            </div>
+            <button id="saveSettingsBtn" class="btn btn-primary">حفظ الإعدادات</button>
+        </div>
+
+        <div class="footer">
+            Admin: <span id="adminStatus">...</span> |
+            S1 Check: <span id="s1Status">...</span>
         </div>
     </div>
 
