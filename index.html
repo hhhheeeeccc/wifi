@@ -3,17 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WiFi Hotspot Pro</title>
+    <title>WiFi Hotspot Pro - Professional Edition</title>
     <style>
         :root {
-            --bg-color: #0f172a;
-            --container-bg: #1e293b;
+            --bg-color: #020617;
+            --container-bg: #0f172a;
             --primary-color: #3b82f6;
             --primary-hover: #2563eb;
             --text-color: #f8fafc;
             --text-muted: #94a3b8;
-            --border-color: #334155;
+            --border-color: #1e293b;
             --accent-color: #10b981;
+            --danger-color: #ef4444;
         }
 
         body {
@@ -29,44 +30,52 @@
         }
 
         .app-container {
-            width: 600px;
-            height: 500px;
+            width: 650px;
+            height: 580px;
             background-color: var(--container-bg);
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            border-radius: 16px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             display: flex;
             flex-direction: column;
             border: 1px solid var(--border-color);
+            position: relative;
         }
 
         .header {
-            padding: 20px;
+            padding: 24px;
             text-align: center;
             border-bottom: 1px solid var(--border-color);
+            background: linear-gradient(to bottom, #1e293b50, transparent);
         }
 
         .header h1 {
             margin: 0;
-            font-size: 1.5rem;
+            font-size: 1.75rem;
             color: var(--primary-color);
+            letter-spacing: -0.025em;
         }
 
         .tabs {
             display: flex;
-            background-color: #0f172a50;
+            background-color: #00000020;
             border-bottom: 1px solid var(--border-color);
         }
 
         .tab-btn {
             flex: 1;
-            padding: 12px;
+            padding: 14px;
             border: none;
             background: none;
             color: var(--text-muted);
             cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s;
-            border-bottom: 2px solid transparent;
+            font-weight: 600;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-color);
+            background-color: #ffffff05;
         }
 
         .tab-btn.active {
@@ -77,74 +86,113 @@
 
         .tab-content {
             flex: 1;
-            padding: 20px;
+            padding: 24px;
             overflow-y: auto;
             display: none;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .tab-content.active {
             display: block;
         }
 
-        .status-card {
+        .grid-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
             background-color: #ffffff05;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 15px;
+            padding: 16px;
+            border-radius: 12px;
             border: 1px solid var(--border-color);
-        }
-
-        .status-row {
             display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
+            flex-direction: column;
+            gap: 4px;
         }
 
-        .status-label {
+        .stat-label {
             color: var(--text-muted);
-        }
-
-        .status-value {
+            font-size: 0.8rem;
+            text-transform: uppercase;
             font-weight: bold;
         }
 
-        .status-value.on { color: var(--accent-color); }
-        .status-value.off { color: #ef4444; }
+        .stat-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .badge-off { background-color: #ef444420; color: #f87171; border: 1px solid #ef444440; }
+        .badge-on { background-color: #10b98120; color: #34d399; border: 1px solid #10b98140; }
 
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
 
         label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             color: var(--text-muted);
             font-size: 0.9rem;
+            font-weight: 500;
         }
 
-        input {
+        input[type="text"], input[type="password"] {
             width: 100%;
-            padding: 10px;
-            border-radius: 6px;
+            padding: 12px;
+            border-radius: 8px;
             border: 1px solid var(--border-color);
-            background-color: #0f172a;
+            background-color: #020617;
             color: white;
             box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px #3b82f620;
         }
 
         .btn {
             width: 100%;
-            padding: 12px;
+            padding: 14px;
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
-            font-weight: bold;
+            font-weight: 700;
             font-size: 1rem;
-            transition: background-color 0.2s;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
         .btn-primary { background-color: var(--primary-color); color: white; }
-        .btn-primary:hover { background-color: var(--primary-hover); }
+        .btn-primary:hover { background-color: var(--primary-hover); transform: translateY(-1px); }
+        .btn-primary:active { transform: translateY(0); }
+
+        .btn-danger { background-color: var(--danger-color); color: white; }
+        .btn-danger:hover { background-color: #dc2626; transform: translateY(-1px); }
 
         .client-list {
             list-style: none;
@@ -155,26 +203,44 @@
         .client-item {
             display: flex;
             justify-content: space-between;
-            padding: 10px;
-            border-bottom: 1px solid var(--border-color);
-            font-size: 0.9rem;
+            align-items: center;
+            padding: 16px;
+            background-color: #ffffff03;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            border: 1px solid var(--border-color);
         }
 
-        .client-info span {
-            display: block;
-        }
-
-        .client-mac {
-            color: var(--text-muted);
-            font-size: 0.8rem;
-        }
+        .client-info { display: flex; flex-direction: column; gap: 2px; }
+        .client-name { font-weight: 600; }
+        .client-mac { color: var(--text-muted); font-size: 0.75rem; font-family: monospace; }
+        .client-ip { font-family: monospace; color: var(--primary-color); font-weight: bold; }
 
         .footer {
-            padding: 10px;
-            font-size: 0.8rem;
-            text-align: center;
+            padding: 12px 24px;
+            font-size: 0.75rem;
+            display: flex;
+            justify-content: space-between;
             color: var(--text-muted);
             border-top: 1px solid var(--border-color);
+            background-color: #00000010;
+        }
+
+        .feature-tag {
+            font-size: 0.7rem;
+            background: #3b82f620;
+            color: #3b82f6;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-right: 8px;
+        }
+
+        /* Tooltip style message */
+        #msg {
+            text-align: center;
+            margin-top: 16px;
+            font-size: 0.875rem;
+            min-height: 1.25rem;
         }
     </style>
 </head>
@@ -185,36 +251,60 @@
         </div>
 
         <div class="tabs">
-            <button class="tab-btn active" data-tab="status">الحالة</button>
+            <button class="tab-btn active" data-tab="status">الحالة العامة</button>
             <button class="tab-btn" data-tab="clients">الأجهزة المتصلة</button>
-            <button class="tab-btn" data-tab="settings">الإعدادات</button>
+            <button class="tab-btn" data-tab="settings">الإعدادات المتقدمة</button>
         </div>
 
         <!-- Status Tab -->
         <div id="status" class="tab-content active">
-            <div class="status-card">
-                <div class="status-row">
-                    <span class="status-label">حالة الشبكة:</span>
-                    <span id="hotspotStatus" class="status-value off">مغلق</span>
+            <div class="grid-stats">
+                <div class="stat-card">
+                    <span class="stat-label">حالة الخدمة</span>
+                    <div id="hotspotStatusBadge" class="status-badge badge-off">
+                        <span id="hotspotStatus">مغلق</span>
+                    </div>
                 </div>
-                <div class="status-row">
-                    <span class="status-label">اسم الشبكة (SSID):</span>
-                    <span id="currentSSID" class="status-value">---</span>
+                <div class="stat-card">
+                    <span class="stat-label">الأجهزة المتصلة</span>
+                    <span id="clientCount" class="stat-value">0</span>
                 </div>
-                <div class="status-row">
-                    <span class="status-label">الأجهزة المتصلة:</span>
-                    <span id="clientCount" class="status-value">0</span>
+                <div class="stat-card">
+                    <span class="stat-label">اسم الشبكة النشط</span>
+                    <span id="currentSSID" class="stat-value">---</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">نوع الحماية</span>
+                    <span class="stat-value">WPA2-PSK</span>
                 </div>
             </div>
 
-            <button id="startBtn" class="btn btn-primary">تشغيل نقطة الاتصال</button>
-            <p id="msg" style="text-align: center; margin-top: 15px; font-size: 0.9rem; color: var(--text-muted);"></p>
+            <button id="startBtn" class="btn btn-primary">
+                <span>تشغيل نقطة الاتصال</span>
+            </button>
+            <p id="msg"></p>
+
+            <div style="margin-top: 20px; padding: 15px; border-radius: 8px; background: #3b82f610; border: 1px solid #3b82f620;">
+                <h4 style="margin: 0 0 10px 0; font-size: 0.9rem; color: var(--primary-color);">ميزات النسخة الاحترافية النشطة:</h4>
+                <ul style="margin: 0; padding-right: 20px; font-size: 0.85rem; color: var(--text-muted);">
+                    <li>تخطي جدار حماية SentinelOne (يعمل بالـ APIs الرسمية).</li>
+                    <li>دعم مشاركة إنترنت الـ Ethernet والـ WiFi.</li>
+                    <li>إدارة قواعد جدار الحماية (Firewall) تلقائياً.</li>
+                </ul>
+            </div>
         </div>
 
         <!-- Clients Tab -->
         <div id="clients" class="tab-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h3 style="margin: 0; font-size: 1.1rem;">قائمة الأجهزة النشطة</h3>
+                <span style="font-size: 0.8rem; color: var(--text-muted);">تحديث تلقائي كل 5 ثوانٍ</span>
+            </div>
             <ul id="clientList" class="client-list">
-                <li style="text-align: center; color: var(--text-muted); margin-top: 20px;">لا توجد أجهزة متصلة حالياً</li>
+                <li style="text-align: center; color: var(--text-muted); margin-top: 40px;">
+                    <div style="font-size: 3rem; margin-bottom: 10px; opacity: 0.2;">📶</div>
+                    لا توجد أجهزة متصلة حالياً بالشبكة
+                </li>
             </ul>
         </div>
 
@@ -225,15 +315,47 @@
                 <input type="text" id="ssid" value="WiFiHotspotPro">
             </div>
             <div class="form-group">
-                <label>كلمة المرور (8 أحرف على الأقل)</label>
+                <label>كلمة المرor (8 أحرف على الأقل)</label>
                 <input type="password" id="password" value="Pass1234!">
             </div>
-            <button id="saveSettingsBtn" class="btn btn-primary">حفظ الإعدادات</button>
+
+            <div style="border-top: 1px solid var(--border-color); margin-top: 24px; padding-top: 20px;">
+                <h4 style="margin: 0 0 15px 0; color: var(--primary-color);">إعدادات الحماية والرقابة</h4>
+
+                <div class="form-group" style="display: flex; align-items: center; gap: 12px;">
+                    <input type="checkbox" id="blockP2P" style="width: 18px; height: 18px; cursor: pointer;">
+                    <label for="blockP2P" style="margin-bottom: 0; cursor: pointer;">
+                        منع برامج مشاركة الملفات (P2P/Torrent)
+                        <span style="display: block; font-size: 0.75rem; color: var(--text-muted);">يقوم بإغلاق المنافذ الشائعة للـ BitTorrent</span>
+                    </label>
+                </div>
+
+                <div class="form-group" style="display: flex; align-items: center; gap: 12px; opacity: 0.5;">
+                    <input type="checkbox" id="urlTracking" style="width: 18px; height: 18px;" disabled>
+                    <label style="margin-bottom: 0;">
+                        تتبع الروابط (URL Tracking)
+                        <span class="feature-tag">قريباً</span>
+                    </label>
+                </div>
+
+                <div class="form-group" style="display: flex; align-items: center; gap: 12px; opacity: 0.5;">
+                    <input type="checkbox" id="bandwidthLimit" style="width: 18px; height: 18px;" disabled>
+                    <label style="margin-bottom: 0;">
+                        تحديد السرعة (Bandwidth Limit)
+                        <span class="feature-tag">قريباً</span>
+                    </label>
+                </div>
+            </div>
+
+            <button id="saveSettingsBtn" class="btn btn-primary" style="margin-top: 10px;">
+                <span>حفظ وتطبيق الإعدادات</span>
+            </button>
         </div>
 
         <div class="footer">
-            Admin: <span id="adminStatus">...</span> |
-            S1 Check: <span id="s1Status">...</span>
+            <div>صلاحيات المسؤول: <span id="adminStatus" style="font-weight: bold;">...</span></div>
+            <div>SentinelOne: <span id="s1Status" style="font-weight: bold;">...</span></div>
+            <div>v2.1.0 Professional</div>
         </div>
     </div>
 

@@ -96,10 +96,26 @@ async function enableICS() {
   }
 }
 
+async function toggleP2PBlock(enable) {
+  const ruleName = "WiFiHotspotPro_BlockP2P";
+  try {
+    if (enable) {
+      await execPromise(`netsh advfirewall firewall add rule name="${ruleName}" dir=out action=block protocol=TCP remoteport=6881-6889,1214,6346,4662`);
+      await execPromise(`netsh advfirewall firewall add rule name="${ruleName}" dir=in action=block protocol=TCP localport=6881-6889,1214,6346,4662`);
+    } else {
+      await execPromise(`netsh advfirewall firewall delete rule name="${ruleName}"`);
+    }
+    return { success: true };
+  } catch (e) {
+    if (!enable) return { success: true };
+    return { success: false, error: e.message };
+  }
+}
+
 function createWindow() {
   const mainWindow = new BrowserWindow({
     width: 650,
-    height: 550,
+    height: 600,
     resizable: false,
     autoHideMenuBar: true,
     webPreferences: {
@@ -133,6 +149,24 @@ app.whenReady().then(() => {
       return { success: true };
     }
     return winrtResult;
+  });
+
+  ipcMain.handle('stop-hotspot', async () => {
+    const script = `
+      Add-Type -AssemblyName Windows.Networking
+      $manager = [Windows.Networking.NetworkOperators.NetworkOperatorTetheringManager, Windows.Networking.NetworkOperators, ContentType=WindowsRuntime]::CreateFromConnectionProfile([Windows.Networking.Connectivity.NetworkInformation, Windows.Networking.Connectivity, ContentType=WindowsRuntime]::GetInternetConnectionProfile())
+      $manager.StopTetheringAsync().GetResults()
+    `;
+    try {
+      await execPromise(`powershell "${script.replace(/\n/g, '')}"`);
+      return { success: true };
+    } catch (e) {
+      return { success: false, error: e.message };
+    }
+  });
+
+  ipcMain.handle('toggle-p2p-block', async (event, enable) => {
+    return await toggleP2PBlock(enable);
   });
 
   app.on('activate', function () {
