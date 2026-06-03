@@ -4,7 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WiFi Hotspot Pro</title>
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/header.css">
+    <link rel="stylesheet" href="css/status.css">
+    <link rel="stylesheet" href="css/forms.css">
+    <link rel="stylesheet" href="css/buttons.css">
+    <link rel="stylesheet" href="css/clients.css">
+    <link rel="stylesheet" href="css/responsive.css">
     <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .tabs { display: flex; background: var(--card-bg); border-radius: 8px; margin-bottom: 20px; overflow: hidden; border: 1px solid var(--border-color); }
+        .tab { flex: 1; padding: 12px; text-align: center; cursor: pointer; transition: background 0.3s; border-bottom: 3px solid transparent; color: #555; }
+        .tab.active { background: var(--primary-color); color: white; border-bottom: 3px solid var(--accent-color); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        #qrContainer { text-align: center; margin-top: 15px; padding: 15px; background: white; border-radius: 8px; display: none; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        #qrImage { max-width: 180px; height: auto; }
+        .qr-section { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        .client-actions { display: flex; gap: 5px; }
+        .share-box { text-align: center; padding: 25px; }
+        .share-url { font-family: monospace; background: #e8f0fe; padding: 12px; border-radius: 6px; margin: 15px 0; display: inline-block; border: 1px dashed var(--primary-color); color: var(--primary-color); font-weight: bold; }
+        .logs-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.9em; background: white; }
+        .logs-table th, .logs-table td { padding: 12px; border: 1px solid var(--border-color); text-align: right; }
+        .logs-table th { background: #f1f3f4; color: #3c4043; }
+        .blocked-client { background-color: #ffebee; opacity: 0.8; }
+        .port-forward-group { border: 1px solid #ddd; padding: 15px; border-radius: 8px; margin-top: 15px; }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -12,112 +39,181 @@
         <div class="header">
             <h1>
                 <span class="header-icon">📡</span>
-                WiFi Hotspot Pro
+                <span data-i18n="appTitle">WiFi Hotspot Pro</span>
             </h1>
-            <p>تطبيق احترافي لمشاركة الإنترنت عبر نقطة اتصال واي فاي</p>
+            <p data-i18n="appSubtitle">تطبيق احترافي لمشاركة الإنترنت عبر نقطة اتصال واي فاي</p>
         </div>
 
-        <!-- Main Grid -->
-        <div class="main-grid">
-            <!-- Status Section -->
+        <!-- Navigation Tabs -->
+        <div class="tabs">
+            <div class="tab active" data-target="hotspotTab" data-i18n="tabHome">🏠 الرئيسية</div>
+            <div class="tab" data-target="clientsTab" data-i18n="tabClients">👥 الأجهزة</div>
+            <div class="tab" data-target="sharingTab" data-i18n="tabSharing">📂 المشاركة</div>
+            <div class="tab" data-target="logsTab" data-i18n="tabLogs">📋 السجلات</div>
+            <div class="tab" data-target="settingsTab" data-i18n="tabSettings">⚙️ الإعدادات</div>
+        </div>
+
+        <!-- Main Content -->
+        <div id="hotspotTab" class="tab-content active">
+            <div class="main-grid">
+                <!-- Status Section -->
+                <div class="status-box">
+                    <h2 data-i18n="systemStatus">🔍 حالة النظام</h2>
+                    <div class="system-info">
+                        <div class="info-card">
+                            <div class="info-card-label" data-i18n="privileges">الصلاحيات</div>
+                            <div class="info-card-value" id="adminStatus">---</div>
+                        </div>
+                        <div class="info-card">
+                            <div class="info-card-label" data-i18n="protection">الحماية</div>
+                            <div class="info-card-value" id="s1Status">---</div>
+                        </div>
+                    </div>
+                    <div style="border-top: 1px solid var(--border-color); padding-top: 15px;">
+                        <div class="status-item">
+                            <span class="status-label" data-i18n="hotspotState">حالة الشبكة</span>
+                            <span class="status-badge badge-off" id="hotspotStatusBadge">
+                                <span id="hotspotStatus" data-i18n="closed">مغلقة</span>
+                            </span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label" data-i18n="networkName">اسم الشبكة</span>
+                            <span class="status-value" id="currentSSID">---</span>
+                        </div>
+                    </div>
+
+                    <!-- QR Section -->
+                    <div id="qrContainer">
+                        <h3 data-i18n="quickConnect">📱 رمز الاتصال السريع</h3>
+                        <div class="qr-section">
+                            <img id="qrImage" src="" alt="QR Code">
+                            <p style="font-size: 0.8em; color: #666;" data-i18n="scanToConnect">امسح الكود للاتصال فوراً</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Control Section -->
+                <div class="settings-box">
+                    <h2 data-i18n="networkControl">⚙️ التحكم بالشبكة</h2>
+                    <div class="form-group">
+                        <label for="ssid" data-i18n="ssidLabel">اسم الشبكة (SSID)</label>
+                        <input type="text" id="ssid" value="WiFiHotspotPro">
+                    </div>
+                    <div class="form-group">
+                        <label for="password" data-i18n="passwordLabel">كلمة المرور</label>
+                        <input type="password" id="password" value="Pass1234!">
+                    </div>
+                    <div class="button-group">
+                        <button id="startBtn" class="btn btn-success">
+                            <span>▶️</span>
+                            <span data-i18n="startHotspot">تشغيل الشبكة</span>
+                        </button>
+                        <button id="showQRBtn" class="btn btn-primary" style="display: none;">
+                            <span>📱</span>
+                            <span data-i18n="qrCode">رمز QR</span>
+                        </button>
+                    </div>
+                    <div id="msg"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="clientsTab" class="tab-content">
+            <div class="clients-box">
+                <h2>
+                    <span data-i18n="connectedDevices">👥 الأجهزة المتصلة</span>
+                    <span class="client-count" id="connectedBadge">0</span>
+                </h2>
+                <ul class="clients-list" id="clientList">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📶</div>
+                        <p data-i18n="noClients">لا توجد أجهزة متصلة حالياً</p>
+                    </div>
+                </ul>
+            </div>
+        </div>
+
+        <div id="sharingTab" class="tab-content">
+            <div class="status-box share-box">
+                <h2 data-i18n="fileSharing">📂 مشاركة الملفات المحلية</h2>
+                <p data-i18n="sharingDesc">شارك الملفات مع الأجهزة المتصلة بالشبكة بسهولة.</p>
+                <div id="sharingStatus" style="margin: 20px 0;">
+                    <button id="startSharingBtn" class="btn btn-success" data-i18n="startSharing">تشغيل خادم المشاركة</button>
+                    <button id="stopSharingBtn" class="btn btn-danger" style="display: none;" data-i18n="stopSharing">إيقاف المشاركة</button>
+                </div>
+                <div id="shareInfo" style="display: none;">
+                    <p data-i18n="sharingLink">رابط المشاركة:</p>
+                    <div class="share-url" id="shareUrlText">http://192.168.137.1:8080</div>
+                    <p style="font-size: 0.9em; color: #666;" data-i18n="sharingLinkDesc">يمكن للمتصلين فتح هذا الرابط في المتصفح</p>
+                </div>
+                <button id="openFolderBtn" class="btn btn-primary">📂 <span data-i18n="openSharedFolder">فتح مجلد المشاركة</span></button>
+            </div>
+        </div>
+
+        <div id="logsTab" class="tab-content">
             <div class="status-box">
-                <h2>🔍 حالة النظام</h2>
-
-                <div class="system-info">
-                    <div class="info-card">
-                        <div class="info-card-label">الصلاحيات</div>
-                        <div class="info-card-value" id="adminStatus">---</div>
-                    </div>
-                    <div class="info-card">
-                        <div class="info-card-label">الحماية</div>
-                        <div class="info-card-value" id="s1Status">---</div>
-                    </div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h2 data-i18n="connectionLogs">📋 سجلات الاتصال</h2>
+                    <button id="clearLogsBtn" class="btn btn-secondary btn-sm" data-i18n="clearLogs">مسح السجل</button>
                 </div>
-
-                <div style="border-top: 1px solid var(--border-color); padding-top: 15px;">
-                    <div class="status-item">
-                        <span class="status-label">حالة نقطة الاتصال</span>
-                        <span class="status-badge badge-off" id="hotspotStatusBadge">
-                            <span id="hotspotStatus">مغلقة</span>
-                        </span>
-                    </div>
-                    <div class="status-item">
-                        <span class="status-label">اسم الشبكة (SSID)</span>
-                        <span class="status-value" id="currentSSID">---</span>
-                    </div>
-                    <div class="status-item">
-                        <span class="status-label">الأجهزة المتصلة</span>
-                        <span class="status-value" id="clientCount">0</span>
-                    </div>
-                    <div class="status-item">
-                        <span class="status-label">نوع الأمان</span>
-                        <span class="status-value">WPA2-Personal</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Settings Section -->
-            <div class="settings-box">
-                <h2>⚙️ إعدادات الشبكة</h2>
-
-                <div class="form-group">
-                    <label for="ssid">اسم الشبكة (SSID)</label>
-                    <input type="text" id="ssid" value="WiFiHotspotPro" placeholder="أدخل اسم الشبكة">
-                </div>
-
-                <div class="form-group">
-                    <label for="password">كلمة المرور (8 أحرف على الأقل)</label>
-                    <input type="password" id="password" value="Pass1234!" placeholder="أدخل كلمة مرور قوية">
-                </div>
-
-                <div class="button-group">
-                    <button id="startBtn" class="btn btn-success">
-                        <span>▶️</span>
-                        <span>تشغيل الشبكة</span>
-                    </button>
-                    <button class="btn btn-secondary">
-                        <span>↻</span>
-                        <span>إعادة تعيين</span>
-                    </button>
-                </div>
-
-                <div id="msg"></div>
+                <table class="logs-table">
+                    <thead>
+                        <tr>
+                            <th data-i18n="logTime">الوقت</th>
+                            <th data-i18n="logEvent">الحدث</th>
+                            <th>MAC</th>
+                            <th>IP</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logsTableBody"></tbody>
+                </table>
             </div>
         </div>
 
-        <!-- Clients Section -->
-        <div class="clients-box">
-            <h2>
-                👥 الأجهزة المتصلة
-                <span class="client-count" id="connectedBadge">0</span>
-            </h2>
-
-            <ul class="clients-list" id="clientList">
-                <div class="empty-state">
-                    <div class="empty-state-icon">📶</div>
-                    <p>لا توجد أجهزة متصلة حالياً</p>
+        <div id="settingsTab" class="tab-content">
+            <div class="security-section">
+                <h2 data-i18n="advancedSecurity">🔒 الأمان المتقدم</h2>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="blockP2P">
+                    <label for="blockP2P" data-i18n="blockP2PLabel">حظر تطبيقات مشاركة الملفات (P2P)</label>
                 </div>
-            </ul>
-        </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="enableLogs">
+                    <label for="enableLogs" data-i18n="enableLogsLabel">تفعيل تتبع الروابط (Logging)</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="enablePortal">
+                    <label for="enablePortal" data-i18n="enablePortalLabel">تفعيل بوابة المصادقة (Captive Portal)</label>
+                </div>
 
-        <!-- Security Section -->
-        <div class="security-section" style="margin-top: 20px;">
-            <h2>🔒 إعدادات الأمان</h2>
+                <div class="port-forward-group">
+                    <h3 data-i18n="portForwarding">توجيه المنافذ (Port Forwarding)</h3>
+                    <div style="display: flex; gap: 10px; margin-top: 10px;">
+                        <input type="number" id="listenPort" placeholder="منفذ الاستماع" style="flex: 1;">
+                        <input type="text" id="targetIp" placeholder="IP الهدف" style="flex: 2;">
+                        <input type="number" id="targetPort" placeholder="منفذ الهدف" style="flex: 1;">
+                        <button id="addPortBtn" class="btn btn-primary btn-sm">إضافة</button>
+                    </div>
+                </div>
 
-            <div class="checkbox-group">
-                <input type="checkbox" id="blockP2P">
-                <label for="blockP2P">حظر تطبيقات مشاركة الملفات (P2P)</label>
+                <div class="form-group" style="margin-top: 25px; border-top: 1px solid #eee; padding-top: 15px;">
+                    <label data-i18n="languageLabel">اللغة (Language)</label>
+                    <select id="langSelect" class="form-control">
+                        <option value="ar">العربية (Arabic)</option>
+                        <option value="en">English (الإنجليزية)</option>
+                    </select>
+                </div>
+
+                <button id="saveSettingsBtn" class="btn btn-primary" style="margin-top: 15px;">
+                    <span>💾</span>
+                    <span data-i18n="saveSettings">حفظ الإعدادات</span>
+                </button>
             </div>
-
-            <button id="saveSettingsBtn" class="btn btn-primary" style="margin-top: 15px;">
-                <span>💾</span>
-                <span>حفظ الإعدادات</span>
-            </button>
         </div>
 
         <!-- Footer -->
         <div class="footer">
-            <p>WiFi Hotspot Pro v2.1.0 | تطبيق مفتوح المصدر | جميع الحقوق محفوظة ©</p>
+            <p>WiFi Hotspot Pro v2.2.0 | <span data-i18n="openSource">تطبيق مفتوح المصدر</span> | <span data-i18n="allRightsReserved">جميع الحقوق محفوظة ©</span></p>
         </div>
     </div>
 
