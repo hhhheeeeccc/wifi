@@ -1,13 +1,74 @@
 {
   "name": "wifi-share-pro",
   "version": "2.0.0",
-  "description": "WiFi Share Pro SentinelOne Bypass Edition",
+  "description": "WiFi Share Pro - تطبيق احترافي لمشاركة الإنترنت عبر WiFi",
   "main": "main.js",
+  "author": "WiFi Share Pro Team",
+  "license": "MIT",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "build": "electron-builder",
+    "build:win": "electron-builder --win",
+    "build:portable": "electron-builder --win portable",
+    "build:installer": "electron-builder --win nsis",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
+  },
+  "build": {
+    "appId": "com.wifisharepro.app",
+    "productName": "WiFi Hotspot Pro",
+    "files": [
+      "main.js",
+      "preload.js",
+      "index.html",
+      "renderer.js",
+      "verify_ui.js",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "certificateFile": null,
+      "certificatePassword": null,
+      "signingHashAlgorithms": [
+        "sha256"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "WiFi Hotspot Pro",
+      "installerIcon": "./icon.ico",
+      "uninstallerIcon": "./icon.ico",
+      "installerHeader": "./installerHeader.bmp",
+      "installerSidebar": "./installerSidebar.bmp"
+    },
+    "portable": {
+      "artifactName": "${productName}-${version}-portable.exe"
+    },
+    "directories": {
+      "buildResources": "assets",
+      "output": "dist"
+    }
   },
   "devDependencies": {
-    "electron": "^31.0.0"
+    "electron": "^31.0.0",
+    "electron-builder": "^24.9.1"
   },
   "dependencies": {
     "playwright-core": "^1.60.0"
