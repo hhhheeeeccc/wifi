@@ -1,7 +1,7 @@
 const adminStatus = document.getElementById('adminStatus');
 const s1Status = document.getElementById('s1Status');
 const hotspotStatus = document.getElementById('hotspotStatus');
-const hotspotStatusBadge = document.getElementById('hotspotStatusBadge');
+const topStatus = document.getElementById('topStatus');
 const currentSSID = document.getElementById('currentSSID');
 const clientCount = document.getElementById('clientCount');
 const ssidInput = document.getElementById('ssid');
@@ -32,10 +32,13 @@ tabButtons.forEach(btn => {
 async function updateStatus() {
     try {
         const info = await window.electronAPI.getSystemInfo();
-        adminStatus.textContent = info.isAdmin ? 'نعم' : 'لا';
-        s1Status.textContent = info.s1Running ? 'يعمل (محمي)' : 'غير موجود';
+        adminStatus.textContent = info.isAdmin ? 'نشط' : 'غير نشط';
+        s1Status.textContent = info.s1Running ? 'محمي' : 'غير موجود';
 
-        // Update client list if hotspot is running
+        // Dynamic colors for footer status
+        adminStatus.style.color = info.isAdmin ? 'var(--success)' : 'var(--danger)';
+        s1Status.style.color = info.s1Running ? 'var(--success)' : 'var(--text-muted)';
+
         if (isHotspotRunning) {
             const clients = await window.electronAPI.getConnectedClients();
             updateClientList(clients);
@@ -48,9 +51,9 @@ async function updateStatus() {
 function updateClientList(clients) {
     if (!clients || clients.length === 0) {
         clientList.innerHTML = `
-            <li style="text-align: center; color: var(--text-muted); margin-top: 40px;">
-                <div style="font-size: 3rem; margin-bottom: 10px; opacity: 0.2;">📶</div>
-                لا توجد أجهزة متصلة حالياً بالشبكة
+            <li style="text-align: center; color: var(--text-muted); padding: 60px 0;">
+                <div style="font-size: 4rem; margin-bottom: 16px; opacity: 0.1;">📶</div>
+                <p style="font-weight: 600;">لا توجد أجهزة متصلة حالياً</p>
             </li>
         `;
         clientCount.textContent = '0';
@@ -73,24 +76,29 @@ function updateClientList(clients) {
     });
 }
 
+const playIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>';
+const stopIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12"></rect></svg>';
+
 startBtn.addEventListener('click', async () => {
     if (isHotspotRunning) {
+        msg.style.color = 'var(--text-muted)';
         msg.textContent = 'جارٍ إيقاف نقطة الاتصال...';
         startBtn.disabled = true;
+
         const result = await window.electronAPI.stopHotspot();
         if (result.success) {
             isHotspotRunning = false;
             hotspotStatus.textContent = 'مغلق';
-            hotspotStatusBadge.className = 'status-badge badge-off';
+            topStatus.className = 'status-badge badge-off';
             currentSSID.textContent = '---';
-            startBtn.innerHTML = '<span>تشغيل نقطة الاتصال</span>';
+            startBtn.innerHTML = `${playIcon} <span>تشغيل نقطة الاتصال</span>`;
             startBtn.className = 'btn btn-primary';
-            msg.style.color = 'var(--accent-color)';
+            msg.style.color = 'var(--success)';
             msg.textContent = '✅ تم إيقاف نقطة الاتصال بنجاح';
             clientCount.textContent = '0';
             updateClientList([]);
         } else {
-            msg.style.color = 'var(--danger-color)';
+            msg.style.color = 'var(--danger)';
             msg.textContent = '❌ فشل الإيقاف: ' + result.error;
         }
         startBtn.disabled = false;
@@ -98,7 +106,7 @@ startBtn.addEventListener('click', async () => {
     }
 
     if (passInput.value.length < 8) {
-        msg.style.color = 'var(--danger-color)';
+        msg.style.color = 'var(--danger)';
         msg.textContent = '❌ كلمة المرور يجب أن تكون 8 أحرف على الأقل';
         return;
     }
@@ -115,14 +123,14 @@ startBtn.addEventListener('click', async () => {
     if (result.success) {
         isHotspotRunning = true;
         hotspotStatus.textContent = 'يعمل الآن';
-        hotspotStatusBadge.className = 'status-badge badge-on';
+        topStatus.className = 'status-badge badge-on';
         currentSSID.textContent = ssidInput.value;
-        startBtn.innerHTML = '<span>إيقاف نقطة الاتصال</span>';
+        startBtn.innerHTML = `${stopIcon} <span>إيقاف نقطة الاتصال</span>`;
         startBtn.className = 'btn btn-danger';
-        msg.style.color = 'var(--accent-color)';
+        msg.style.color = 'var(--success)';
         msg.textContent = '✅ تم تشغيل الشبكة بنجاح!';
     } else {
-        msg.style.color = 'var(--danger-color)';
+        msg.style.color = 'var(--danger)';
         msg.textContent = '❌ فشل التشغيل: ' + result.error;
     }
     startBtn.disabled = false;
@@ -131,16 +139,16 @@ startBtn.addEventListener('click', async () => {
 saveSettingsBtn.addEventListener('click', async () => {
     saveSettingsBtn.disabled = true;
     msg.style.color = 'var(--text-muted)';
-    msg.textContent = 'جارٍ تطبيق الإعدادات الحماية...';
+    msg.textContent = 'جارٍ تطبيق إعدادات الحماية...';
 
     const shouldBlock = blockP2PCheckbox.checked;
     const result = await window.electronAPI.toggleP2PBlock(shouldBlock);
 
     if (result.success) {
-        msg.style.color = 'var(--accent-color)';
+        msg.style.color = 'var(--success)';
         msg.textContent = '✅ تم حفظ الإعدادات وتحديث قواعد جدار الحماية';
     } else {
-        msg.style.color = 'var(--danger-color)';
+        msg.style.color = 'var(--danger)';
         msg.textContent = '❌ فشل تطبيق القواعد: ' + result.error;
     }
 
