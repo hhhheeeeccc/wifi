@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WiFi Hotspot Pro</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>
+                <span class="header-icon">📡</span>
+                WiFi Hotspot Pro
+            </h1>
+            <p>تطبيق احترافي لمشاركة الإنترنت عبر نقطة اتصال واي فاي</p>
+        </div>
+
+        <!-- Main Grid -->
+        <div class="main-grid">
+            <!-- Status Section -->
+            <div class="status-box">
+                <h2>🔍 حالة النظام</h2>
+
+                <div class="system-info">
+                    <div class="info-card">
+                        <div class="info-card-label">الصلاحيات</div>
+                        <div class="info-card-value" id="adminStatus">---</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-card-label">الحماية</div>
+                        <div class="info-card-value" id="s1Status">---</div>
+                    </div>
+                </div>
+
+                <div style="border-top: 1px solid var(--border-color); padding-top: 15px;">
+                    <div class="status-item">
+                        <span class="status-label">حالة نقطة الاتصال</span>
+                        <span class="status-badge badge-off" id="hotspotStatusBadge">
+                            <span id="hotspotStatus">مغلقة</span>
+                        </span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">اسم الشبكة (SSID)</span>
+                        <span class="status-value" id="currentSSID">---</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">الأجهزة المتصلة</span>
+                        <span class="status-value" id="clientCount">0</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">نوع الأمان</span>
+                        <span class="status-value">WPA2-Personal</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Section -->
+            <div class="settings-box">
+                <h2>⚙️ إعدادات الشبكة</h2>
+
+                <div class="form-group">
+                    <label for="ssid">اسم الشبكة (SSID)</label>
+                    <input type="text" id="ssid" value="WiFiHotspotPro" placeholder="أدخل اسم الشبكة">
+                </div>
+
+                <div class="form-group">
+                    <label for="password">كلمة المرور (8 أحرف على الأقل)</label>
+                    <input type="password" id="password" value="Pass1234!" placeholder="أدخل كلمة مرور قوية">
+                </div>
+
+                <div class="button-group">
+                    <button id="startBtn" class="btn btn-success">
+                        <span>▶️</span>
+                        <span>تشغيل الشبكة</span>
+                    </button>
+                    <button class="btn btn-secondary">
+                        <span>↻</span>
+                        <span>إعادة تعيين</span>
+                    </button>
+                </div>
+
+                <div id="msg"></div>
+            </div>
+        </div>
+
+        <!-- Clients Section -->
+        <div class="clients-box">
+            <h2>
+                👥 الأجهزة المتصلة
+                <span class="client-count" id="connectedBadge">0</span>
+            </h2>
+
+            <ul class="clients-list" id="clientList">
+                <div class="empty-state">
+                    <div class="empty-state-icon">📶</div>
+                    <p>لا توجد أجهزة متصلة حالياً</p>
+                </div>
+            </ul>
+        </div>
+
+        <!-- Security Section -->
+        <div class="security-section" style="margin-top: 20px;">
+            <h2>🔒 إعدادات الأمان</h2>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="blockP2P">
+                <label for="blockP2P">حظر تطبيقات مشاركة الملفات (P2P)</label>
+            </div>
+
+            <button id="saveSettingsBtn" class="btn btn-primary" style="margin-top: 15px;">
+                <span>💾</span>
+                <span>حفظ الإعدادات</span>
+            </button>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>WiFi Hotspot Pro v2.1.0 | تطبيق مفتوح المصدر | جميع الحقوق محفوظة ©</p>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
