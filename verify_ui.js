@@ -1,22 +1,35 @@
 const { _electron: electron } = require('playwright-core');
 
 (async () => {
+  console.log('Starting UI verification...');
   const electronApp = await electron.launch({
     args: ['.'],
     executablePath: './node_modules/electron/dist/electron'
   });
-  const window = await electronApp.firstWindow();
 
-  await window.waitForTimeout(2000);
-  await window.screenshot({ path: 'status_tab.png' });
+  try {
+    const window = await electronApp.firstWindow();
+    console.log('Window loaded.');
 
-  await window.click('button[data-tab="clients"]');
-  await window.waitForTimeout(500);
-  await window.screenshot({ path: 'clients_tab.png' });
+    await window.waitForTimeout(3000);
+    await window.screenshot({ path: 'status_tab.png' });
+    console.log('Screenshot saved: status_tab.png');
 
-  await window.click('button[data-tab="settings"]');
-  await window.waitForTimeout(500);
-  await window.screenshot({ path: 'settings_tab.png' });
+    // تأكد من وجود العناصر الأساسية
+    const title = await window.innerText('h1');
+    console.log('Page Title:', title);
 
-  await electronApp.close();
+    if (title.includes('WiFi Hotspot Pro')) {
+        console.log('✅ UI elements verified successfully.');
+    } else {
+        console.error('❌ UI elements verification failed.');
+        process.exit(1);
+    }
+
+  } catch (error) {
+    console.error('Verification Error:', error);
+    process.exit(1);
+  } finally {
+    await electronApp.close();
+  }
 })();

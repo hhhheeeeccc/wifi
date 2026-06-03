@@ -1,8 +1,8 @@
 {
   "name": "wifi-share-pro",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "WiFi Share Pro - تطبيق احترافي لمشاركة الإنترنت عبر WiFi",
-  "main": "main.js",
+  "main": "src/main/index.js",
   "author": "WiFi Share Pro Team",
   "license": "MIT",
   "scripts": {
@@ -18,10 +18,8 @@
     "appId": "com.wifisharepro.app",
     "productName": "WiFi Hotspot Pro",
     "files": [
-      "main.js",
-      "preload.js",
-      "index.html",
-      "renderer.js",
+      "src/**/*",
+      "assets/**/*",
       "verify_ui.js",
       "node_modules/**/*",
       "package.json"

@@ -1,0 +1,12 @@
+{
+  "learnings": [
+    {
+      "topic": "Project Restructuring",
+      "learning": "When restructuring an Electron app into a 'src' folder, ensure that 'package.json' 'main' entry point is updated and all internal paths (preload, icon, loadFile) are correctly adjusted relative to the new file locations."
+    },
+    {
+      "topic": "CSS Organization",
+      "learning": "Separating styles into specific files (layout, header, status, etc.) improves maintainability, but it's crucial to verify all files are actually created and properly imported in the main style file."
+    }
+  ]
+}
