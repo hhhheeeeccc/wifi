@@ -1,9 +1,11 @@
+// DOM Elements
 const adminStatus = document.getElementById('adminStatus');
 const s1Status = document.getElementById('s1Status');
 const hotspotStatus = document.getElementById('hotspotStatus');
 const hotspotStatusBadge = document.getElementById('hotspotStatusBadge');
 const currentSSID = document.getElementById('currentSSID');
 const clientCount = document.getElementById('clientCount');
+const connectedBadge = document.getElementById('connectedBadge');
 const ssidInput = document.getElementById('ssid');
 const passInput = document.getElementById('password');
 const startBtn = document.getElementById('startBtn');
@@ -11,61 +13,91 @@ const saveSettingsBtn = document.getElementById('saveSettingsBtn');
 const blockP2PCheckbox = document.getElementById('blockP2P');
 const clientList = document.getElementById('clientList');
 const msg = document.getElementById('msg');
-const tabButtons = document.querySelectorAll('.tab-btn');
-const tabContents = document.querySelectorAll('.tab-content');
 
 let isHotspotRunning = false;
+let updateInterval = null;
 
-// Tab Switching Logic
-tabButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-        const tabId = btn.getAttribute('data-tab');
+/**
+ * عرض رسالة في واجهة المستخدم
+ * @param {string} message - نص الرسالة
+ * @param {string} type - نوع الرسالة (success, error, info)
+ * @param {number} duration - مدة الرسالة بالميلي ثانية (0 = بدون حد)
+ */
+function showMessage(message, type = 'info', duration = 0) {
+    msg.textContent = message;
+    msg.className = '';
+    
+    if (type === 'success') {
+        msg.className = 'msg-success';
+    } else if (type === 'error') {
+        msg.className = 'msg-error';
+    } else {
+        msg.className = 'msg-info';
+    }
+    
+    if (duration > 0) {
+        setTimeout(() => {
+            msg.textContent = '';
+            msg.className = '';
+        }, duration);
+    }
+}
 
-        tabButtons.forEach(b => b.classList.remove('active'));
-        tabContents.forEach(c => c.classList.remove('active'));
-
-        btn.classList.add('active');
-        document.getElementById(tabId).classList.add('active');
-    });
-});
-
+/**
+ * تحديث حالة النظام
+ */
 async function updateStatus() {
     try {
         const info = await window.electronAPI.getSystemInfo();
-        adminStatus.textContent = info.isAdmin ? 'نعم' : 'لا';
-        s1Status.textContent = info.s1Running ? 'يعمل (محمي)' : 'غير موجود';
-
-        // Update client list if hotspot is running
+        
+        // تحديث معلومات الصلاحيات
+        adminStatus.textContent = info.isAdmin ? '✅ نعم' : '❌ لا';
+        s1Status.textContent = info.s1Running ? '🔒 يعمل (محمي)' : '✓ غير موجود';
+        
+        // تحديث قائمة الأجهزة إذا كانت نقطة الاتصال تعمل
         if (isHotspotRunning) {
             const clients = await window.electronAPI.getConnectedClients();
             updateClientList(clients);
         }
     } catch (err) {
-        console.error('Error updating status:', err);
+        console.error('خطأ في تحديث الحالة:', err);
     }
 }
 
+/**
+ * تحديث قائمة الأجهزة المتصلة
+ * @param {Array} clients - قائمة الأجهزة المتصلة
+ */
 function updateClientList(clients) {
     if (!clients || clients.length === 0) {
         clientList.innerHTML = `
-            <li style="text-align: center; color: var(--text-muted); margin-top: 40px;">
-                <div style="font-size: 3rem; margin-bottom: 10px; opacity: 0.2;">📶</div>
-                لا توجد أجهزة متصلة حالياً بالشبكة
-            </li>
+            <div class="empty-state">
+                <div class="empty-state-icon">📶</div>
+                <p>لا توجد أجهزة متصلة حالياً</p>
+            </div>
         `;
         clientCount.textContent = '0';
+        connectedBadge.textContent = '0';
         return;
     }
 
+    // تحديث عدد الأجهزة المتصلة
     clientCount.textContent = clients.length;
+    connectedBadge.textContent = clients.length;
+    
+    // مسح القائمة القديمة
     clientList.innerHTML = '';
-    clients.forEach(client => {
+    
+    // إضافة الأجهزة الجديدة
+    clients.forEach((client, index) => {
         const li = document.createElement('li');
         li.className = 'client-item';
         li.innerHTML = `
             <div class="client-info">
-                <span class="client-name">${client.name || 'جهاز غير معروف'}</span>
-                <span class="client-mac">${client.mac}</span>
+                <span class="client-name">
+                    <strong>${index + 1}. ${client.name || 'جهاز غير معروف'}</strong>
+                </span>
+                <span class="client-mac">MAC: ${client.mac}</span>
             </div>
             <div class="client-ip">${client.ip}</div>
         `;
@@ -73,38 +105,55 @@ function updateClientList(clients) {
     });
 }
 
+/**
+ * تشغيل/إيقاف نقطة الاتصال
+ */
 startBtn.addEventListener('click', async () => {
+    // إذا كانت نقطة الاتصال تعمل، سيتم إيقافها
     if (isHotspotRunning) {
-        msg.textContent = 'جارٍ إيقاف نقطة الاتصال...';
+        showMessage('جارٍ إيقاف نقطة الاتصال...', 'info');
         startBtn.disabled = true;
+        
         const result = await window.electronAPI.stopHotspot();
+        
         if (result.success) {
             isHotspotRunning = false;
-            hotspotStatus.textContent = 'مغلق';
+            hotspotStatus.textContent = 'مغلقة';
             hotspotStatusBadge.className = 'status-badge badge-off';
             currentSSID.textContent = '---';
-            startBtn.innerHTML = '<span>تشغيل نقطة الاتصال</span>';
-            startBtn.className = 'btn btn-primary';
-            msg.style.color = 'var(--accent-color)';
-            msg.textContent = '✅ تم إيقاف نقطة الاتصال بنجاح';
+            startBtn.innerHTML = '<span>▶️</span><span>تشغيل الشبكة</span>';
+            startBtn.className = 'btn btn-success';
+            showMessage('✅ تم إيقاف نقطة الاتصال بنجاح', 'success', 3000);
             clientCount.textContent = '0';
+            connectedBadge.textContent = '0';
             updateClientList([]);
+            
+            // إيقاف تحديث قائمة الأجهزة
+            if (updateInterval) {
+                clearInterval(updateInterval);
+                updateInterval = null;
+            }
         } else {
-            msg.style.color = 'var(--danger-color)';
-            msg.textContent = '❌ فشل الإيقاف: ' + result.error;
+            showMessage('❌ فشل الإيقاف: ' + result.error, 'error', 3000);
         }
+        
         startBtn.disabled = false;
         return;
     }
 
+    // التحقق من كلمة المرور
     if (passInput.value.length < 8) {
-        msg.style.color = 'var(--danger-color)';
-        msg.textContent = '❌ كلمة المرور يجب أن تكون 8 أحرف على الأقل';
+        showMessage('❌ كلمة المرور يجب أن تكون 8 أحرف على الأقل', 'error', 3000);
         return;
     }
 
-    msg.style.color = 'var(--text-muted)';
-    msg.textContent = 'جارٍ تشغيل نقطة الاتصال...';
+    // التحقق من اسم الشبكة
+    if (!ssidInput.value || ssidInput.value.trim().length === 0) {
+        showMessage('❌ يجب إدخال اسم الشبكة', 'error', 3000);
+        return;
+    }
+
+    showMessage('جارٍ تشغيل نقطة الاتصال...', 'info');
     startBtn.disabled = true;
 
     const result = await window.electronAPI.startHotspot({
@@ -114,43 +163,72 @@ startBtn.addEventListener('click', async () => {
 
     if (result.success) {
         isHotspotRunning = true;
-        hotspotStatus.textContent = 'يعمل الآن';
+        hotspotStatus.textContent = 'نشطة الآن ✓';
         hotspotStatusBadge.className = 'status-badge badge-on';
         currentSSID.textContent = ssidInput.value;
-        startBtn.innerHTML = '<span>إيقاف نقطة الاتصال</span>';
+        startBtn.innerHTML = '<span>⏹️</span><span>إيقاف الشبكة</span>';
         startBtn.className = 'btn btn-danger';
-        msg.style.color = 'var(--accent-color)';
-        msg.textContent = '✅ تم تشغيل الشبكة بنجاح!';
+        showMessage('✅ تم تشغيل الشبكة بنجاح!', 'success', 3000);
+        
+        // بدء تحديث قائمة الأجهزة كل 5 ثواني
+        if (updateInterval) {
+            clearInterval(updateInterval);
+        }
+        updateInterval = setInterval(updateStatus, 5000);
     } else {
-        msg.style.color = 'var(--danger-color)';
-        msg.textContent = '❌ فشل التشغيل: ' + result.error;
+        showMessage('❌ فشل التشغيل: ' + result.error, 'error', 3000);
     }
+    
     startBtn.disabled = false;
 });
 
+/**
+ * حفظ إعدادات الأمان
+ */
 saveSettingsBtn.addEventListener('click', async () => {
     saveSettingsBtn.disabled = true;
-    msg.style.color = 'var(--text-muted)';
-    msg.textContent = 'جارٍ تطبيق الإعدادات الحماية...';
+    showMessage('جارٍ تطبيق إعدادات الأمان...', 'info');
 
     const shouldBlock = blockP2PCheckbox.checked;
     const result = await window.electronAPI.toggleP2PBlock(shouldBlock);
 
     if (result.success) {
-        msg.style.color = 'var(--accent-color)';
-        msg.textContent = '✅ تم حفظ الإعدادات وتحديث قواعد جدار الحماية';
+        const action = shouldBlock ? 'تفعيل' : 'تعطيل';
+        showMessage(`✅ تم ${action} حظر P2P بنجاح`, 'success', 3000);
     } else {
-        msg.style.color = 'var(--danger-color)';
-        msg.textContent = '❌ فشل تطبيق القواعد: ' + result.error;
+        showMessage('❌ فشل تطبيق الإعدادات: ' + result.error, 'error', 3000);
     }
 
-    setTimeout(() => {
-        msg.textContent = '';
-        saveSettingsBtn.disabled = false;
-    }, 3000);
+    saveSettingsBtn.disabled = false;
 });
 
-// Initial update
-updateStatus();
-// Periodically update client list and status
-setInterval(updateStatus, 5000);
+/**
+ * إعادة تعيين الإعدادات
+ */
+const resetBtn = document.querySelector('button:nth-of-type(2)');
+if (resetBtn) {
+    resetBtn.addEventListener('click', () => {
+        ssidInput.value = 'WiFiHotspotPro';
+        passInput.value = 'Pass1234!';
+        blockP2PCheckbox.checked = false;
+        showMessage('✅ تم إعادة تعيين الإعدادات الافتراضية', 'success', 2000);
+    });
+}
+
+/**
+ * تحديث معلومات الحالة عند تحميل الصفحة
+ */
+document.addEventListener('DOMContentLoaded', () => {
+    updateStatus();
+    // تحديث الحالة كل 10 ثواني
+    setInterval(updateStatus, 10000);
+});
+
+/**
+ * تنظيف عند إغلاق الصفحة
+ */
+window.addEventListener('beforeunload', () => {
+    if (updateInterval) {
+        clearInterval(updateInterval);
+    }
+});
