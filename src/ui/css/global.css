@@ -1,0 +1,21 @@
+/**
+ * الأنماط العامة
+ */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.6;
+  direction: rtl;
+}
+
+html[lang="en"] {
+  direction: ltr;
+}

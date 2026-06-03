@@ -1,0 +1,10 @@
+/* استيراد الأنماط */
+@import './variables.css';
+@import './global.css';
+@import './header.css';
+@import './layout.css';
+@import './forms.css';
+@import './buttons.css';
+@import './status.css';
+@import './clients.css';
+@import './responsive.css';
