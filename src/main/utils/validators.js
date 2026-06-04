@@ -5,5 +5,5 @@
 /**
  * تطهير مدخلات المستخدم من الأحرف الخطرة
  */
-function sanitizeInput(str) {
+const sanitizeInput = (str) => {
   return str.replace(/[\
