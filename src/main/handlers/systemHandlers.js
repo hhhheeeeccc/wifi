@@ -39,7 +39,7 @@ async function checkSentinelOne() {
  */
 async function getWifiInfo() {
   try {
-    const powershellCmd = `Get-NetAdapter | Where-Object {$_.MediaType -eq 'Native 802.11'} | Select-Object Name, Status, InterfaceDescription | ConvertTo-Json`;
+    const powershellCmd = "Get-NetAdapter | Where-Object {$_.MediaType -eq 'Native 802.11'} | Select-Object Name, Status, InterfaceDescription | ConvertTo-Json";
     const { stdout } = await execAsync(`powershell "${powershellCmd}"`);
     
     if (!stdout.trim()) {
@@ -62,7 +62,7 @@ async function getWifiInfo() {
  */
 async function getConnectedClients() {
   try {
-    const script = `Get-NetNeighbor | Where-Object { $_.State -eq 'Reachable' -and $_.IPAddress -notlike '169.254.*' -and $_.IPAddress -notlike 'fe80*' } | Select-Object IPAddress, LinkLayerAddress | ConvertTo-Json`;
+    const script = "Get-NetNeighbor | Where-Object { $_.State -eq 'Reachable' -and $_.IPAddress -notlike '169.254.*' -and $_.IPAddress -notlike 'fe80*' } | Select-Object IPAddress, LinkLayerAddress | ConvertTo-Json";
     const { stdout } = await execAsync(`powershell "${script.replace(/\n/g, '')}"`);
     
     if (!stdout.trim()) {
