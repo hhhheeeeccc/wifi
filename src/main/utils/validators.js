@@ -12,14 +12,14 @@ function sanitizeInput(str) {
 /**
  * التحقق من كلمة المرور
  */
-function validatePassword(password) {
+export function validatePassword(password) {
   return Boolean(password && password.length >= 8);
 }
 
 /**
  * التحقق من SSID
  */
-function validateSSID(ssid) {
+export function validateSSID(ssid) {
   return Boolean(ssid && ssid.trim().length !== 0 && ssid.length <= 32);
 }
 
