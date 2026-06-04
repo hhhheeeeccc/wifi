@@ -13,7 +13,7 @@ async function checkAdmin() {
     await execAsync('net session');
     logger.info('Admin privileges: YES');
     return true;
-  } catch (error) {
+  } catch (_error) {
     logger.warn('Admin privileges: NO');
     return false;
   }

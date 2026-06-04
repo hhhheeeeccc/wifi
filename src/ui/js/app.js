@@ -171,7 +171,7 @@ class WiFiHotspotApp {
   }
 
   async initializeApp() {
-    try { this.state.blacklist = await window.electronAPI.getBlacklist() || []; } catch(e) { this.state.blacklist = []; }
+    try { this.state.blacklist = await window.electronAPI.getBlacklist() || []; } catch { this.state.blacklist = []; }
     this.setLanguage('ar');
     document.addEventListener('DOMContentLoaded', () => this.updateStatus());
     setInterval(() => this.updateStatus(), 10000);
@@ -192,7 +192,7 @@ class WiFiHotspotApp {
       const info = await window.electronAPI.getSystemInfo();
       this.updateStatusElements(info);
       if (this.state.isHotspotRunning) await this.updateClientList();
-    } catch (error) {
+    } catch {
       console.error('Error updating status');
     }
   }

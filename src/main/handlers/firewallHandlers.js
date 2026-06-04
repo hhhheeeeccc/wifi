@@ -63,7 +63,7 @@ async function removeP2PBlockRules() {
   for (const rule of rules) {
     try {
       await execAsync(`netsh advfirewall firewall delete rule name="${rule}"`);
-    } catch (error) {
+    } catch {
       // تجاهل الأخطاء إذا كانت القاعدة غير موجودة
       logger.warn(`Rule "${rule}" not found or already deleted`);
     }

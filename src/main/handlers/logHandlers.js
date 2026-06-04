@@ -56,7 +56,7 @@ function logConnection(type, mac, ip, details = '') {
 function getLogs() {
     try {
         return db.prepare('SELECT * FROM connection_logs ORDER BY timestamp DESC LIMIT 100').all();
-    } catch (error) {
+    } catch {
         return [];
     }
 }
