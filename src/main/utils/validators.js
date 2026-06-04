@@ -6,4 +6,5 @@
  * تطهير مدخلات المستخدم من الأحرف الخطرة
  */
 const sanitizeInput = (str) => {
-  return str.replace(/[\
+  return str.replace(/[<>\/\\&'\"]/g, '');
+};
