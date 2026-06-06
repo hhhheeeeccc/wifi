@@ -70,7 +70,7 @@ async function stopHotspot() {
       }
     `;
     
-    await execAsync(`powershell "${script.replace(/\n/g, '')}"`);
+    await execAsync(`powershell "${script.split('\n').map(l => l.trim()).filter(l => l).join('; ')}"`);
     
     hotspotState.isRunning = false;
     hotspotState.ssid = '';
@@ -107,8 +107,8 @@ async function enableWinRTHotspot(ssid, password) {
         }
         $manager = [Windows.Networking.NetworkOperators.NetworkOperatorTetheringManager]::CreateFromConnectionProfile($connectionProfile)
         $config = $manager.GetCurrentAccessPointConfiguration()
-        $config.Ssid = "${ssid}"
-        $config.Passphrase = "${password}"
+        $config.Ssid = '${ssid}'
+        $config.Passphrase = '${password}'
         $manager.ConfigureAccessPointAsync($config).GetResults()
         $manager.StartTetheringAsync().GetResults()
       } catch {
@@ -116,7 +116,7 @@ async function enableWinRTHotspot(ssid, password) {
       }
     `;
     
-    await execAsync(`powershell "${script.replace(/\n/g, '')}"`);
+    await execAsync(`powershell "${script.split('\n').map(l => l.trim()).filter(l => l).join('; ')}"`);
     return { success: true };
   } catch (error) {
     logger.error('WinRT hotspot error:', error.message);
@@ -150,7 +150,7 @@ async function enableICS() {
       }
     `;
     
-    await execAsync(`powershell "${script.replace(/\n/g, '')}"`);
+    await execAsync(`powershell "${script.split('\n').map(l => l.trim()).filter(l => l).join('; ')}"`);
     logger.info('ICS enabled successfully');
     return { success: true };
   } catch (error) {

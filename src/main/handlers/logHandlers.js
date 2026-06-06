@@ -5,12 +5,19 @@
 const { app } = require('electron');
 const Database = require('better-sqlite3');
 const path = require('path');
+const fs = require('fs');
 const logger = require('../utils/logger');
 
 const dbPath = path.join(app.getPath('userData'), 'history.db');
 let db;
 
-try {
+function initDatabase() {
+  try {
+    const dbDir = path.dirname(dbPath);
+    if (!fs.existsSync(dbDir)) {
+      fs.mkdirSync(dbDir, { recursive: true });
+    }
+
     db = new Database(dbPath);
     // إنشاء الجداول إذا لم تكن موجودة
     db.prepare(`
@@ -34,8 +41,11 @@ try {
     `).run();
 
     logger.info('Database initialized successfully');
-} catch (error) {
+    return { success: true };
+  } catch (error) {
     logger.error('Failed to initialize database:', error.message);
+    return { success: false, error: error.message };
+  }
 }
 
 /**
@@ -74,6 +84,7 @@ function clearLogs() {
 }
 
 module.exports = {
+    initDatabase,
     logConnection,
     getLogs,
     clearLogs
