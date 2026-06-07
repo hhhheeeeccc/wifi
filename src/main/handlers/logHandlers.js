@@ -8,7 +8,6 @@ const path = require('path');
 const fs = require('fs');
 const logger = require('../utils/logger');
 
-const dbPath = path.join(app.getPath('userData'), 'history.db');
 let db;
 
 /**
@@ -16,14 +15,18 @@ let db;
  */
 function initDatabase() {
   try {
+    const userDataPath = app.getPath('userData');
+    const dbPath = path.join(userDataPath, 'history.db');
     const dbDir = path.dirname(dbPath);
+
     if (!fs.existsSync(dbDir)) {
       fs.mkdirSync(dbDir, { recursive: true });
     }
 
     db = new Database(dbPath);
+
     // إنشاء الجداول إذا لم تكن موجودة
-    db.prepare(`
+    db.exec(`
         CREATE TABLE IF NOT EXISTS connection_logs (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -31,17 +34,15 @@ function initDatabase() {
             mac TEXT,
             ip TEXT,
             details TEXT
-        )
-    `).run();
+        );
 
-    db.prepare(`
         CREATE TABLE IF NOT EXISTS url_logs (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
             client_ip TEXT,
             url TEXT
-        )
-    `).run();
+        );
+    `);
 
     logger.info('Database initialized successfully');
     return { success: true };
@@ -54,11 +55,11 @@ function initDatabase() {
 /**
  * تسجيل حدث اتصال
  */
-function logConnection(type, mac, ip, details) {
-    const safeDetails = details || '';
+function logConnection(type, mac, ip, details = '') {
+    if (!db) return;
     try {
         const stmt = db.prepare('INSERT INTO connection_logs (event_type, mac, ip, details) VALUES (?, ?, ?, ?)');
-        stmt.run(type, mac, ip, safeDetails);
+        stmt.run(type, mac, ip, details);
     } catch (error) {
         logger.error('Error logging connection:', error.message);
     }
@@ -68,9 +69,11 @@ function logConnection(type, mac, ip, details) {
  * الحصول على السجلات
  */
 function getLogs() {
+    if (!db) return [];
     try {
         return db.prepare('SELECT * FROM connection_logs ORDER BY timestamp DESC LIMIT 100').all();
-    } catch (error) {
+    } catch (err) {
+        logger.error('Error getting logs:', err.message);
         return [];
     }
 }
@@ -79,6 +82,7 @@ function getLogs() {
  * مسح السجلات
  */
 function clearLogs() {
+    if (!db) return { success: false, error: 'Database not initialized' };
     try {
         db.prepare('DELETE FROM connection_logs').run();
         return { success: true };

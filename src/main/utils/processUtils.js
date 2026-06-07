@@ -14,7 +14,7 @@ async function runPowerShell(script) {
   const formattedScript = script
     .split('\n')
     .map(function(l) { return l.trim(); })
-    .filter(function(l) { return l; })
+    .filter(Boolean)
     .join('; ');
 
   return await execAsync(`powershell "${formattedScript}"`);
