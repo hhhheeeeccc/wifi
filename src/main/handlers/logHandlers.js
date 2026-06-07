@@ -37,6 +37,7 @@ export const initDatabase = () => {
             timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
             client_ip TEXT,
             url TEXT
+`
         )
     `).run();
 
