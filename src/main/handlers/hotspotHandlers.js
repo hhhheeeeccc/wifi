@@ -2,7 +2,7 @@
  * معالجات نقطة الاتصال (Hotspot)
  */
 
-const { execAsync, runPowerShell } = require('../utils/processUtils');
+const { runPowerShell } = require('../utils/processUtils');
 const { sanitizeInput } = require('../utils/validators');
 const logger = require('../utils/logger');
 

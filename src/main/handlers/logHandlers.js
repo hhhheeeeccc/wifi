@@ -11,42 +11,44 @@ const logger = require('../utils/logger');
 const dbPath = path.join(app.getPath('userData'), 'history.db');
 let db;
 
-function initDatabase() {
-  try {
-    const dbDir = path.dirname(dbPath);
-    if (!fs.existsSync(dbDir)) {
-      fs.mkdirSync(dbDir, { recursive: true });
+(function() {
+  function initDatabase() {
+    try {
+      const dbDir = path.dirname(dbPath);
+      if (!fs.existsSync(dbDir)) {
+        fs.mkdirSync(dbDir, { recursive: true });
+      }
+
+      db = new Database(dbPath);
+      // إنشاء الجداول إذا لم تكن موجودة
+      db.prepare(`
+          CREATE TABLE IF NOT EXISTS connection_logs (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+              event_type TEXT,
+              mac TEXT,
+              ip TEXT,
+              details TEXT
+          )
+      `).run();
+
+      db.prepare(`
+          CREATE TABLE IF NOT EXISTS url_logs (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+              client_ip TEXT,
+              url TEXT
+          )
+      `).run();
+
+      logger.info('Database initialized successfully');
+      return { success: true };
+    } catch (error) {
+      logger.error('Failed to initialize database:', error.message);
+      return { success: false, error: error.message };
     }
-
-    db = new Database(dbPath);
-    // إنشاء الجداول إذا لم تكن موجودة
-    db.prepare(`
-        CREATE TABLE IF NOT EXISTS connection_logs (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-            event_type TEXT,
-            mac TEXT,
-            ip TEXT,
-            details TEXT
-        )
-    `).run();
-
-    db.prepare(`
-        CREATE TABLE IF NOT EXISTS url_logs (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-            client_ip TEXT,
-            url TEXT
-        )
-    `).run();
-
-    logger.info('Database initialized successfully');
-    return { success: true };
-  } catch (error) {
-    logger.error('Failed to initialize database:', error.message);
-    return { success: false, error: error.message };
   }
-}
+})();
 
 /**
  * تسجيل حدث اتصال
