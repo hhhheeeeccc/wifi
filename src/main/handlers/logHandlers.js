@@ -11,7 +11,7 @@ const logger = require('../utils/logger');
 const dbPath = path.join(app.getPath('userData'), 'history.db');
 let db;
 
-export const initDatabase = () => {
+function initDatabase() {
   try {
     const dbDir = path.dirname(dbPath);
     if (!fs.existsSync(dbDir)) {
@@ -37,7 +37,6 @@ export const initDatabase = () => {
             timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
             client_ip TEXT,
             url TEXT
-`
         )
     `).run();
 

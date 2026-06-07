@@ -2,7 +2,7 @@
  * معالجات نقطة الاتصال (Hotspot)
  */
 
-const { execAsync } = require('../utils/processUtils');
+const { execAsync, runPowerShell } = require('../utils/processUtils');
 const { sanitizeInput } = require('../utils/validators');
 const logger = require('../utils/logger');
 
@@ -70,7 +70,7 @@ async function stopHotspot() {
       }
     `;
     
-    await execAsync(`powershell "${script.split('\n').map(l => l.trim()).filter(l => l).join('; ')}"`);
+    await runPowerShell(script);
     
     hotspotState.isRunning = false;
     hotspotState.ssid = '';
@@ -116,7 +116,7 @@ async function enableWinRTHotspot(ssid, password) {
       }
     `;
     
-    await execAsync(`powershell "${script.split('\n').map(l => l.trim()).filter(l => l).join('; ')}"`);
+    await runPowerShell(script);
     return { success: true };
   } catch (error) {
     logger.error('WinRT hotspot error:', error.message);
@@ -150,7 +150,7 @@ async function enableICS() {
       }
     `;
     
-    await execAsync(`powershell "${script.split('\n').map(l => l.trim()).filter(l => l).join('; ')}"`);
+    await runPowerShell(script);
     logger.info('ICS enabled successfully');
     return { success: true };
   } catch (error) {
