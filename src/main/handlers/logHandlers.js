@@ -11,7 +11,7 @@ const logger = require('../utils/logger');
 const dbPath = path.join(app.getPath('userData'), 'history.db');
 let db;
 
-export function initDatabase() {
+export const initDatabase = () => {
   try {
     const dbDir = path.dirname(dbPath);
     if (!fs.existsSync(dbDir)) {
