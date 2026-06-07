@@ -10,11 +10,11 @@ const execAsync = util.promisify(exec);
 /**
  * تنفيذ نص PowerShell متعدد الأسطر
  */
-export async function runPowerShell(script) {
+async function runPowerShell(script) {
   const formattedScript = script
     .split('\n')
-    .map(l => l.trim())
-    .filter(l => l)
+    .map(function(l) { return l.trim(); })
+    .filter(function(l) { return l; })
     .join('; ');
 
   return await execAsync(`powershell "${formattedScript}"`);
