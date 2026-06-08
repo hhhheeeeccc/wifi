@@ -49,5 +49,5 @@ function registerIpcHandlers() {
   ipcMain.handle('ports:reset', portHandlers.clearPortForwards);
 }
 
-app.whenReady().then(() => { logHandlers.initDatabase(); createWindow(); registerIpcHandlers(); });
+app.whenReady().then(() => { createWindow(); registerIpcHandlers(); });
 app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit(); });

@@ -2,7 +2,7 @@
  * معالجات نقطة الاتصال (Hotspot)
  */
 
-const { execAsync, runPowerShell } = require('../utils/processUtils');
+const { execAsync } = require('../utils/processUtils');
 const { sanitizeInput } = require('../utils/validators');
 const logger = require('../utils/logger');
 
@@ -11,23 +11,6 @@ let hotspotState = {
   ssid: '',
   startTime: null,
 };
-
-/**
- * بناء نص WinRT PowerShell مشترك
- */
-function buildWinRTScript(innerLogic) {
-  return `
-    Add-Type -AssemblyName Windows.Networking
-    try {
-      [Windows.Networking.Connectivity.NetworkInformation, Windows.Networking.Connectivity, ContentType=WindowsRuntime] | Out-Null
-      [Windows.Networking.NetworkOperators.NetworkOperatorTetheringManager, Windows.Networking.NetworkOperators, ContentType=WindowsRuntime] | Out-Null
-      $connectionProfile = [Windows.Networking.Connectivity.NetworkInformation]::GetInternetConnectionProfile()
-      ${innerLogic}
-    } catch {
-      throw $_
-    }
-  `;
-}
 
 /**
  * تشغيل نقطة الاتصال
@@ -72,14 +55,22 @@ async function stopHotspot() {
   try {
     logger.info('Stopping hotspot...');
     
-    const script = buildWinRTScript(`
-      if ($null -ne $connectionProfile) {
-        $manager = [Windows.Networking.NetworkOperators.NetworkOperatorTetheringManager]::CreateFromConnectionProfile($connectionProfile)
-        $manager.StopTetheringAsync().GetResults()
+    const script = `
+      try {
+        Add-Type -AssemblyName Windows.Networking
+        [Windows.Networking.Connectivity.NetworkInformation, Windows.Networking.Connectivity, ContentType=WindowsRuntime] | Out-Null
+        [Windows.Networking.NetworkOperators.NetworkOperatorTetheringManager, Windows.Networking.NetworkOperators, ContentType=WindowsRuntime] | Out-Null
+        $connectionProfile = [Windows.Networking.Connectivity.NetworkInformation]::GetInternetConnectionProfile()
+        if ($null -ne $connectionProfile) {
+          $manager = [Windows.Networking.NetworkOperators.NetworkOperatorTetheringManager]::CreateFromConnectionProfile($connectionProfile)
+          $manager.StopTetheringAsync().GetResults()
+        }
+      } catch {
+        throw $_
       }
-    `);
+    `;
     
-    await runPowerShell(script);
+    await execAsync(`powershell "${script.replace(/\n/g, '')}"`);
     
     hotspotState.isRunning = false;
     hotspotState.ssid = '';
@@ -105,19 +96,27 @@ function getStatus() {
  */
 async function enableWinRTHotspot(ssid, password) {
   try {
-    const script = buildWinRTScript(`
-      if ($null -eq $connectionProfile) {
-        throw "No internet connection found"
+    const script = `
+      Add-Type -AssemblyName Windows.Networking
+      try {
+        [Windows.Networking.Connectivity.NetworkInformation, Windows.Networking.Connectivity, ContentType=WindowsRuntime] | Out-Null
+        [Windows.Networking.NetworkOperators.NetworkOperatorTetheringManager, Windows.Networking.NetworkOperators, ContentType=WindowsRuntime] | Out-Null
+        $connectionProfile = [Windows.Networking.Connectivity.NetworkInformation]::GetInternetConnectionProfile()
+        if ($null -eq $connectionProfile) {
+          throw "No internet connection found"
+        }
+        $manager = [Windows.Networking.NetworkOperators.NetworkOperatorTetheringManager]::CreateFromConnectionProfile($connectionProfile)
+        $config = $manager.GetCurrentAccessPointConfiguration()
+        $config.Ssid = "${ssid}"
+        $config.Passphrase = "${password}"
+        $manager.ConfigureAccessPointAsync($config).GetResults()
+        $manager.StartTetheringAsync().GetResults()
+      } catch {
+        throw $_
       }
-      $manager = [Windows.Networking.NetworkOperators.NetworkOperatorTetheringManager]::CreateFromConnectionProfile($connectionProfile)
-      $config = $manager.GetCurrentAccessPointConfiguration()
-      $config.Ssid = '${ssid}'
-      $config.Passphrase = '${password}'
-      $manager.ConfigureAccessPointAsync($config).GetResults()
-      $manager.StartTetheringAsync().GetResults()
-    `);
+    `;
     
-    await runPowerShell(script);
+    await execAsync(`powershell "${script.replace(/\n/g, '')}"`);
     return { success: true };
   } catch (error) {
     logger.error('WinRT hotspot error:', error.message);
@@ -151,7 +150,7 @@ async function enableICS() {
       }
     `;
     
-    await runPowerShell(script);
+    await execAsync(`powershell "${script.replace(/\n/g, '')}"`);
     logger.info('ICS enabled successfully');
     return { success: true };
   } catch (error) {
