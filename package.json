@@ -12,7 +12,8 @@
     "build:portable": "electron-builder --win portable",
     "build:installer": "electron-builder --win nsis",
     "pack": "electron-builder --dir",
-    "dist": "electron-builder"
+    "dist": "electron-builder",
+    "build:mac": "electron-builder --mac"
   },
   "build": {
     "appId": "com.wifisharepro.app",
@@ -62,6 +63,16 @@
     "directories": {
       "buildResources": "assets",
       "output": "dist"
+    },
+    "mac": {
+      "category": "public.app-category.utilities",
+      "target": [
+        "dmg",
+        "zip"
+      ]
+    },
+    "dmg": {
+      "title": "${productName} ${version}"
     }
   },
   "devDependencies": {
